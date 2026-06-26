@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Chen — Full-Stack Developer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
+                    colors: {
+                        bg:'#050505', surface:'#121212', card:'#0A0A0A',
+                        'brand-blue':'#0091FF','brand-gold':'#FFC800','brand-cyan':'#00E5FF',
+                        'text-primary':'#FFFFFF','text-secondary':'#A1A1AA','text-dim':'#52525B',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:#050505}
+        ::-webkit-scrollbar-thumb{background:rgba(0,145,255,0.3);border-radius:3px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(0,145,255,0.6)}
+        #three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+        .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(5,5,5,0.55) 100%)}
+        .god-ray{position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 42%,rgba(0,145,255,0.012) 46%,rgba(0,229,255,0.02) 50%,rgba(0,145,255,0.012) 54%,transparent 58%);animation:godRayRotate 25s linear infinite;pointer-events:none;z-index:2}
+        @keyframes godRayRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        #scrollBar{position:fixed;top:0;left:0;height:2px;z-index:100;background:linear-gradient(to right,#0091FF,#00E5FF,#FFC800);width:0%;transition:width 0.1s linear;box-shadow:0 0 12px rgba(0,145,255,0.6)}
+        .reveal-on-scroll{opacity:0;transform:translateY(30px);filter:blur(5px);transition:all 1s cubic-bezier(0.16,1,0.3,1)}
+        .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0);filter:blur(0)}
+        .gradient-text{background:linear-gradient(to right,#0091FF,#00E5FF,#FFFFFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .gradient-text-gold{background:linear-gradient(to right,#FFC800,#0091FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+        /* CARDS — glass that reveals the 3D behind */
+        .card-hover{
+            transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+            border:1px solid rgba(255,255,255,0.06);
+            background:rgba(5,5,5,0.35);
+            backdrop-filter:blur(8px);
+            -webkit-backdrop-filter:blur(8px);
+        }
+        .card-hover:hover{
+            border-color:rgba(0,145,255,0.3);
+            transform:translateY(-4px);
+            box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px rgba(0,145,255,0.08);
+            background:rgba(5,5,5,0.45);
+        }
+
+        /* SECTIONS — fully transparent, 3D bleeds through everywhere */
+        .section-clear{
+            position:relative;
+            z-index:3;
+        }
+
+        /* Terminal — slightly more opaque for code readability */
+        .terminal{
+            background:rgba(5,5,5,0.6);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:12px;
+            overflow:hidden;
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+        }
+        .terminal-header{display:flex;gap:6px;padding:12px 16px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06)}
+        .terminal-dot{width:10px;height:10px;border-radius:50%}
+        .terminal-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8}
+
+        .skill-bar{position:relative;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+        .skill-bar::after{content:'';position:absolute;top:0;left:0;height:100%;border-radius:2px;width:var(--w);transition:width 1.5s cubic-bezier(0.16,1,0.3,1)}
+        .skill-bar.blue::after{background:linear-gradient(to right,#0091FF,#00E5FF)}
+        .skill-bar.gold::after{background:linear-gradient(to right,#FFC800,#0091FF)}
+        .skill-bar.cyan::after{background:linear-gradient(to right,#00E5FF,#0091FF)}
+
+        .tag{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#A1A1AA;transition:all 0.3s}
+        .tag:hover{border-color:rgba(0,145,255,0.4);color:#0091FF;background:rgba(0,145,255,0.08)}
+
+        .timeline-line{position:absolute;left:23px;top:40px;bottom:0;width:1px;background:linear-gradient(to bottom,rgba(0,145,255,0.4),rgba(0,145,255,0.05))}
+        .status-dot{width:12px;height:12px;border-radius:50%;background:#22C55E;position:relative}
+        .status-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;background:rgba(34,197,94,0.25);animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite}
+        @keyframes ping{75%,100%{transform:scale(2);opacity:0}}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+        .cursor-blink::after{content:'▊';animation:blink 1s step-end infinite;color:#0091FF;margin-left:2px}
+        .nav-link{position:relative;color:#A1A1AA;transition:color 0.3s;font-size:14px}
+        .nav-link:hover{color:#FFF}
+        .nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:#0091FF;transition:width 0.3s}
+        .nav-link:hover::after{width:100%}
+        .btn-primary{background:#0091FF;color:#FFF;padding:12px 28px;border-radius:10px;font-weight:600;font-size:14px;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer}
+        .btn-primary:hover{background:#0077CC;box-shadow:0 0 30px rgba(0,145,255,0.4);transform:translateY(-1px)}
+        .btn-outline{background:rgba(255,255,255,0.04);color:#FFF;padding:12px 28px;border-radius:10px;font-weight:600;font-size:14px;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;backdrop-filter:blur(6px)}
+        .btn-outline:hover{border-color:rgba(0,145,255,0.5);background:rgba(0,145,255,0.08)}
+        .project-img{position:relative;overflow:hidden;border-radius:10px}
+        .project-img img{transition:transform 0.6s cubic-bezier(0.16,1,0.3,1)}
+        .project-img:hover img{transform:scale(1.05)}
+        .project-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent 50%)}
+
+        /* Metric cards — very transparent */
+        .metric-card{
+            text-align:center;padding:24px;border-radius:12px;
+            border:1px solid rgba(255,255,255,0.06);
+            background:rgba(5,5,5,0.3);
+            backdrop-filter:blur(6px);
+            -webkit-backdrop-filter:blur(6px);
+            transition:all 0.3s;
+        }
+        .metric-card:hover{border-color:rgba(0,145,255,0.2);background:rgba(0,145,255,0.05)}
+
+        /* Contact links */
+        .contact-link{
+            display:flex;align-items:center;gap:16px;padding:16px;border-radius:12px;
+            border:1px solid rgba(255,255,255,0.06);
+            background:rgba(5,5,5,0.3);
+            backdrop-filter:blur(6px);
+            -webkit-backdrop-filter:blur(6px);
+            transition:all 0.3s;
+        }
+        .contact-link:hover{border-color:rgba(0,145,255,0.3);background:rgba(0,145,255,0.06)}
+
+        /* Education card */
+        .edu-card{
+            display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:24px;border-radius:16px;
+            border:1px solid rgba(255,255,255,0.06);
+            background:rgba(5,5,5,0.3);
+            backdrop-filter:blur(6px);
+            transition:all 0.3s;
+        }
+        .edu-card:hover{border-color:rgba(0,145,255,0.2)}
+
+        .grid-pattern{background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(circle at center,black 40%,transparent 80%)}
+        @media(max-width:768px){
+            .hero-title{font-size:2.5rem!important}
+            .terminal-body{font-size:11px}
+            .nav-links-desktop{display:none!important}
+            .mobile-menu-btn{display:flex!important}
+        }
+        @media(min-width:769px){
+            .mobile-menu-btn{display:none!important}
+            .mobile-menu{display:none!important}
+        }
+    </style>
+</head>
+<body class="bg-bg text-text-primary font-sans antialiased overflow-x-hidden">
+
+<div id="scrollBar"></div>
+<canvas id="three-canvas"></canvas>
+<div class="vignette"></div>
+<div class="god-ray"></div>
+
+<!-- NAVIGATION -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 rounded-lg bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center group-hover:bg-brand-blue/30 transition-colors">
+                <span class="font-mono text-brand-blue font-bold text-sm">&lt;/&gt;</span>
+            </div>
+            <span class="font-semibold text-sm tracking-tight">alex.dev</span>
+        </a>
+        <div class="nav-links-desktop flex items-center gap-8">
+            <a href="#about" class="nav-link">About</a>
+            <a href="#skills" class="nav-link">Skills</a>
+            <a href="#experience" class="nav-link">Experience</a>
+            <a href="#projects" class="nav-link">Projects</a>
+            <a href="#contact" class="nav-link">Contact</a>
+            <a href="#contact" class="btn-primary text-xs py-2 px-5">Hire Me <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i></a>
+        </div>
+        <button class="mobile-menu-btn items-center justify-center w-10 h-10 rounded-lg border border-white/10 bg-white/5" onclick="toggleMobileMenu()">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+    </div>
+    <div id="mobileMenu" class="mobile-menu hidden bg-surface/95 backdrop-blur-xl border-t border-white/5">
+        <div class="px-6 py-4 flex flex-col gap-3">
+            <a href="#about" class="py-2 text-text-secondary hover:text-white transition-colors" onclick="toggleMobileMenu()">About</a>
+            <a href="#skills" class="py-2 text-text-secondary hover:text-white transition-colors" onclick="toggleMobileMenu()">Skills</a>
+            <a href="#experience" class="py-2 text-text-secondary hover:text-white transition-colors" onclick="toggleMobileMenu()">Experience</a>
+            <a href="#projects" class="py-2 text-text-secondary hover:text-white transition-colors" onclick="toggleMobileMenu()">Projects</a>
+            <a href="#contact" class="py-2 text-text-secondary hover:text-white transition-colors" onclick="toggleMobileMenu()">Contact</a>
+            <a href="#contact" class="btn-primary text-center text-xs mt-2">Hire Me</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 section-clear">
+    <div class="grid-pattern absolute inset-0 z-0"></div>
+    <div class="relative z-10 text-center max-w-4xl mx-auto">
+        <div class="reveal-on-scroll inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-sm mb-8">
+            <div class="status-dot"></div>
+            <span class="text-xs text-text-secondary font-mono">Available for opportunities</span>
+        </div>
+        <h1 class="reveal-on-scroll hero-title text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter leading-[0.95] mb-6">
+            Hi, I'm <span class="gradient-text">Alex Chen</span>
+        </h1>
+        <div class="reveal-on-scroll flex items-center justify-center gap-3 mb-8">
+            <span class="text-2xl md:text-3xl font-light text-text-secondary tracking-tight">Full-Stack Developer</span>
+            <span class="text-brand-gold text-xl">✦</span>
+        </div>
+        <div class="reveal-on-scroll terminal max-w-xl mx-auto mb-10">
+            <div class="terminal-header">
+                <div class="terminal-dot bg-red-500/80"></div>
+                <div class="terminal-dot bg-yellow-500/80"></div>
+                <div class="terminal-dot bg-green-500/80"></div>
+                <span class="ml-3 text-[11px] text-text-dim font-mono">about-me.js</span>
+            </div>
+            <div class="terminal-body text-left">
+                <div><span class="text-brand-gold">const</span> <span class="text-brand-cyan">developer</span> = {</div>
+                <div class="pl-4"><span class="text-text-dim">location:</span> <span class="text-green-400">"San Francisco, CA"</span>,</div>
+                <div class="pl-4"><span class="text-text-dim">experience:</span> <span class="text-brand-blue">5</span><span class="text-text-dim">+</span> <span class="text-green-400">"years"</span>,</div>
+                <div class="pl-4"><span class="text-text-dim">focus:</span> [<span class="text-green-400">"React"</span>, <span class="text-green-400">"Node"</span>, <span class="text-green-400">"Cloud"</span>],</div>
+                <div class="pl-4"><span class="text-text-dim">passion:</span> <span class="text-green-400">"Building things that scale"</span></div>
+                <div>};</div>
+                <div class="mt-1 text-text-dim cursor-blink"></div>
+            </div>
+        </div>
+        <div class="reveal-on-scroll flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#projects" class="btn-primary">View My Work <i data-lucide="arrow-down" class="w-4 h-4"></i></a>
+            <a href="#contact" class="btn-outline"><i data-lucide="download" class="w-4 h-4"></i> Download Resume</a>
+        </div>
+        <div class="reveal-on-scroll mt-16 flex flex-col items-center gap-2 text-text-dim">
+            <span class="text-[10px] uppercase tracking-widest font-mono">Scroll to fly through</span>
+            <div class="w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1.5">
+                <div class="w-1 h-2 rounded-full bg-brand-blue animate-bounce"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="relative py-24 md:py-32 px-6 section-clear">
+    <div class="max-w-6xl mx-auto">
+        <div class="reveal-on-scroll flex items-center gap-3 mb-3">
+            <span class="font-mono text-brand-blue text-sm">01.</span>
+            <span class="text-xs uppercase tracking-widest text-text-dim font-medium">About Me</span>
+            <div class="flex-1 h-px bg-white/5"></div>
+        </div>
+        <div class="grid lg:grid-cols-5 gap-12 items-start">
+            <div class="lg:col-span-3">
+                <h2 class="reveal-on-scroll text-3xl md:text-4xl font-semibold tracking-tight mb-6">Building digital products that <span class="gradient-text">matter</span></h2>
+                <div class="space-y-4 text-text-secondary leading-relaxed">
+                    <p class="reveal-on-scroll">I'm a full-stack developer with <strong class="text-white font-medium">5+ years</strong> of experience building web applications that serve millions of users. I specialize in the <strong class="text-white font-medium">React/Next.js</strong> ecosystem with <strong class="text-white font-medium">Node.js</strong> backends.</p>
+                    <p class="reveal-on-scroll">Currently at <strong class="text-brand-blue">TechCorp</strong>, I lead frontend architecture for a SaaS platform handling <strong class="text-white font-medium">2M+ monthly active users</strong>. Previously, I helped a startup grow from 0 to 500K users as their founding engineer.</p>
+                    <p class="reveal-on-scroll">I care deeply about performance, accessibility, and developer experience. When I'm not coding, I'm contributing to open-source projects or writing technical articles.</p>
+                </div>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+                <div class="reveal-on-scroll metric-card"><div class="text-3xl font-semibold gradient-text mb-1" data-count="5">0</div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Years Exp.</div></div>
+                <div class="reveal-on-scroll metric-card"><div class="text-3xl font-semibold gradient-text mb-1" data-count="40">0</div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Projects</div></div>
+                <div class="reveal-on-scroll metric-card"><div class="text-3xl font-semibold gradient-text mb-1" data-count="2" data-suffix="M+">0</div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Users Served</div></div>
+                <div class="reveal-on-scroll metric-card"><div class="text-3xl font-semibold gradient-text mb-1" data-count="15">0</div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Open Source</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="relative py-24 md:py-32 px-6 section-clear">
+    <div class="max-w-6xl mx-auto">
+        <div class="reveal-on-scroll flex items-center gap-3 mb-3">
+            <span class="font-mono text-brand-blue text-sm">02.</span>
+            <span class="text-xs uppercase tracking-widest text-text-dim font-medium">Tech Stack</span>
+            <div class="flex-1 h-px bg-white/5"></div>
+        </div>
+        <h2 class="reveal-on-scroll text-3xl md:text-4xl font-semibold tracking-tight mb-12">Tools I <span class="gradient-text-gold">work with</span></h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="reveal-on-scroll card-hover rounded-2xl p-6">
+                <div class="w-10 h-10 rounded-lg bg-brand-blue/10 border border-brand-blue/20 flex items-center justify-center mb-5"><i data-lucide="monitor" class="w-5 h-5 text-brand-blue"></i></div>
+                <h3 class="font-semibold text-lg mb-1">Frontend</h3>
+                <p class="text-xs text-text-dim mb-5">Client-side development</p>
+                <div class="space-y-4">
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">React / Next.js</span><span class="text-xs font-mono text-brand-blue">95%</span></div><div class="skill-bar blue" style="--w:95%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">TypeScript</span><span class="text-xs font-mono text-brand-blue">92%</span></div><div class="skill-bar blue" style="--w:92%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">Tailwind CSS</span><span class="text-xs font-mono text-brand-blue">96%</span></div><div class="skill-bar blue" style="--w:96%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">Three.js / WebGL</span><span class="text-xs font-mono text-brand-blue">75%</span></div><div class="skill-bar blue" style="--w:75%"></div></div>
+                </div>
+            </div>
+            <div class="reveal-on-scroll card-hover rounded-2xl p-6">
+                <div class="w-10 h-10 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center mb-5"><i data-lucide="server" class="w-5 h-5 text-brand-gold"></i></div>
+                <h3 class="font-semibold text-lg mb-1">Backend</h3>
+                <p class="text-xs text-text-dim mb-5">Server-side & APIs</p>
+                <div class="space-y-4">
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">Node.js / Express</span><span class="text-xs font-mono text-brand-gold">93%</span></div><div class="skill-bar gold" style="--w:93%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">Python / FastAPI</span><span class="text-xs font-mono text-brand-gold">80%</span></div><div class="skill-bar gold" style="--w:80%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">PostgreSQL / Redis</span><span class="text-xs font-mono text-brand-gold">88%</span></div><div class="skill-bar gold" style="--w:88%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">GraphQL</span><span class="text-xs font-mono text-brand-gold">85%</span></div><div class="skill-bar gold" style="--w:85%"></div></div>
+                </div>
+            </div>
+            <div class="reveal-on-scroll card-hover rounded-2xl p-6">
+                <div class="w-10 h-10 rounded-lg bg-brand-cyan/10 border border-brand-cyan/20 flex items-center justify-center mb-5"><i data-lucide="cloud" class="w-5 h-5 text-brand-cyan"></i></div>
+                <h3 class="font-semibold text-lg mb-1">DevOps & Tools</h3>
+                <p class="text-xs text-text-dim mb-5">Infrastructure & workflow</p>
+                <div class="space-y-4">
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">AWS / GCP</span><span class="text-xs font-mono text-brand-cyan">88%</span></div><div class="skill-bar cyan" style="--w:88%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">Docker / K8s</span><span class="text-xs font-mono text-brand-cyan">82%</span></div><div class="skill-bar cyan" style="--w:82%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">CI/CD (GitHub Actions)</span><span class="text-xs font-mono text-brand-cyan">90%</span></div><div class="skill-bar cyan" style="--w:90%"></div></div>
+                    <div><div class="flex justify-between mb-1.5"><span class="text-sm text-text-secondary">Git / Monitoring</span><span class="text-xs font-mono text-brand-cyan">95%</span></div><div class="skill-bar cyan" style="--w:95%"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="reveal-on-scroll mt-8 flex flex-wrap gap-2 justify-center">
+            <span class="tag">Redux</span><span class="tag">Prisma</span><span class="tag">MongoDB</span><span class="tag">Firebase</span><span class="tag">Stripe</span><span class="tag">Framer Motion</span><span class="tag">Storybook</span><span class="tag">Jest</span><span class="tag">Cypress</span><span class="tag">Vercel</span><span class="tag">Terraform</span><span class="tag">Linux</span>
+        </div>
+    </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience" class="relative py-24 md:py-32 px-6 section-clear">
+    <div class="max-w-6xl mx-auto">
+        <div class="reveal-on-scroll flex items-center gap-3 mb-3">
+            <span class="font-mono text-brand-blue text-sm">03.</span>
+            <span class="text-xs uppercase tracking-widest text-text-dim font-medium">Experience</span>
+            <div class="flex-1 h-px bg-white/5"></div>
+        </div>
+        <h2 class="reveal-on-scroll text-3xl md:text-4xl font-semibold tracking-tight mb-12">Where I've <span class="gradient-text">worked</span></h2>
+        <div class="relative max-w-3xl">
+            <div class="timeline-line"></div>
+            <div class="reveal-on-scroll relative pl-16 pb-12">
+                <div class="absolute left-3.5 top-1 w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4 text-brand-blue"></i></div>
+                <div class="card-hover rounded-2xl p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                        <div><h3 class="font-semibold text-lg">Senior Frontend Engineer</h3><span class="text-brand-blue text-sm">TechCorp Inc.</span></div>
+                        <span class="text-xs font-mono text-text-dim bg-white/5 px-3 py-1 rounded-full w-fit">2022 — Present</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-text-secondary leading-relaxed">
+                        <li class="flex gap-2"><span class="text-brand-blue mt-1">▸</span>Led frontend architecture migration to Next.js 14, improving <strong class="text-white">page load by 60%</strong></li>
+                        <li class="flex gap-2"><span class="text-brand-blue mt-1">▸</span>Built a design system with 80+ components used by <strong class="text-white">12 engineering teams</strong></li>
+                        <li class="flex gap-2"><span class="text-brand-blue mt-1">▸</span>Reduced bundle size by <strong class="text-white">45%</strong> through code splitting and tree shaking</li>
+                        <li class="flex gap-2"><span class="text-brand-blue mt-1">▸</span>Mentored 4 junior developers; established code review guidelines</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="reveal-on-scroll relative pl-16 pb-12">
+                <div class="absolute left-3.5 top-1 w-10 h-10 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center"><i data-lucide="rocket" class="w-4 h-4 text-brand-gold"></i></div>
+                <div class="card-hover rounded-2xl p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                        <div><h3 class="font-semibold text-lg">Full-Stack Developer</h3><span class="text-brand-gold text-sm">StartupXYZ</span></div>
+                        <span class="text-xs font-mono text-text-dim bg-white/5 px-3 py-1 rounded-full w-fit">2020 — 2022</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-text-secondary leading-relaxed">
+                        <li class="flex gap-2"><span class="text-brand-gold mt-1">▸</span>Founding engineer — built the entire product from <strong class="text-white">0 to 500K users</strong></li>
+                        <li class="flex gap-2"><span class="text-brand-gold mt-1">▸</span>Designed and implemented RESTful APIs handling <strong class="text-white">10K+ requests/min</strong></li>
+                        <li class="flex gap-2"><span class="text-brand-gold mt-1">▸</span>Set up CI/CD pipelines, reducing deployment time from 2hrs to <strong class="text-white">10 minutes</strong></li>
+                        <li class="flex gap-2"><span class="text-brand-gold mt-1">▸</span>Integrated Stripe payments processing <strong class="text-white">$2M+ in annual revenue</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="reveal-on-scroll relative pl-16">
+                <div class="absolute left-3.5 top-1 w-10 h-10 rounded-xl bg-brand-cyan/10 border border-brand-cyan/30 flex items-center justify-center"><i data-lucide="code" class="w-4 h-4 text-brand-cyan"></i></div>
+                <div class="card-hover rounded-2xl p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                        <div><h3 class="font-semibold text-lg">Junior Developer</h3><span class="text-brand-cyan text-sm">WebAgency Co.</span></div>
+                        <span class="text-xs font-mono text-text-dim bg-white/5 px-3 py-1 rounded-full w-fit">2019 — 2020</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-text-secondary leading-relaxed">
+                        <li class="flex gap-2"><span class="text-brand-cyan mt-1">▸</span>Developed 20+ client websites using React and WordPress</li>
+                        <li class="flex gap-2"><span class="text-brand-cyan mt-1">▸</span>Improved SEO scores by an average of <strong class="text-white">35 points</strong> across all projects</li>
+                        <li class="flex gap-2"><span class="text-brand-cyan mt-1">▸</span>Collaborated with design team to implement pixel-perfect UIs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="reveal-on-scroll mt-16 max-w-3xl">
+            <h3 class="text-sm font-mono text-text-dim uppercase tracking-widest mb-6">Education</h3>
+            <div class="edu-card sm:flex-row sm:items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center"><i data-lucide="graduation-cap" class="w-4 h-4 text-text-secondary"></i></div>
+                    <div><h4 class="font-semibold">B.S. Computer Science</h4><p class="text-sm text-text-secondary">UC Berkeley</p></div>
+                </div>
+                <span class="text-xs font-mono text-text-dim bg-white/5 px-3 py-1 rounded-full w-fit">2015 — 2019</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="relative py-24 md:py-32 px-6 section-clear">
+    <div class="max-w-6xl mx-auto">
+        <div class="reveal-on-scroll flex items-center gap-3 mb-3">
+            <span class="font-mono text-brand-blue text-sm">04.</span>
+            <span class="text-xs uppercase tracking-widest text-text-dim font-medium">Projects</span>
+            <div class="flex-1 h-px bg-white/5"></div>
+        </div>
+        <h2 class="reveal-on-scroll text-3xl md:text-4xl font-semibold tracking-tight mb-4">Featured <span class="gradient-text-gold">work</span></h2>
+        <p class="reveal-on-scroll text-text-secondary mb-12 max-w-xl">A selection of projects I've built — from SaaS platforms to open-source tools.</p>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="reveal-on-scroll card-hover rounded-2xl overflow-hidden group">
+                <div class="project-img aspect-video"><img src="https://picsum.photos/seed/saas-dashboard/800/450.jpg" alt="CloudFlow" class="w-full h-full object-cover"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-lg group-hover:text-brand-blue transition-colors">CloudFlow</h3>
+                        <div class="flex gap-2">
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="github" class="w-3.5 h-3.5"></i></a>
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>
+                        </div>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4 leading-relaxed">Real-time project management SaaS with live collaboration, Kanban boards, and team analytics.</p>
+                    <div class="flex flex-wrap gap-1.5"><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Prisma</span><span class="tag">WebSocket</span><span class="tag">PostgreSQL</span></div>
+                </div>
+            </div>
+            <div class="reveal-on-scroll card-hover rounded-2xl overflow-hidden group">
+                <div class="project-img aspect-video"><img src="https://picsum.photos/seed/ai-tool-dark/800/450.jpg" alt="NeuralKit" class="w-full h-full object-cover"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-lg group-hover:text-brand-blue transition-colors">NeuralKit</h3>
+                        <div class="flex gap-2">
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="github" class="w-3.5 h-3.5"></i></a>
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>
+                        </div>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4 leading-relaxed">Open-source React component library for AI-powered UIs. 2.3K+ GitHub stars.</p>
+                    <div class="flex flex-wrap gap-1.5"><span class="tag">React</span><span class="tag">Storybook</span><span class="tag">OpenAI API</span><span class="tag">npm</span></div>
+                </div>
+            </div>
+            <div class="reveal-on-scroll card-hover rounded-2xl overflow-hidden group">
+                <div class="project-img aspect-video"><img src="https://picsum.photos/seed/ecommerce-modern/800/450.jpg" alt="ShopEngine" class="w-full h-full object-cover"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-lg group-hover:text-brand-blue transition-colors">ShopEngine</h3>
+                        <div class="flex gap-2">
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="github" class="w-3.5 h-3.5"></i></a>
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>
+                        </div>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4 leading-relaxed">Headless e-commerce platform with sub-second page loads. 50K products.</p>
+                    <div class="flex flex-wrap gap-1.5"><span class="tag">Next.js</span><span class="tag">Stripe</span><span class="tag">Algolia</span><span class="tag">Redis</span><span class="tag">AWS</span></div>
+                </div>
+            </div>
+            <div class="reveal-on-scroll card-hover rounded-2xl overflow-hidden group">
+                <div class="project-img aspect-video"><img src="https://picsum.photos/seed/devtools-cli/800/450.jpg" alt="DevCLI" class="w-full h-full object-cover"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-lg group-hover:text-brand-blue transition-colors">DevCLI</h3>
+                        <div class="flex gap-2">
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="github" class="w-3.5 h-3.5"></i></a>
+                            <a href="#" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:border-brand-blue/40 hover:bg-brand-blue/10 transition-all"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>
+                        </div>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4 leading-relaxed">CLI tool that scaffolds full-stack projects in seconds. Supports React, Vue, Svelte.</p>
+                    <div class="flex flex-wrap gap-1.5"><span class="tag">Node.js</span><span class="tag">Commander.js</span><span class="tag">Inquirer</span><span class="tag">npm</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="reveal-on-scroll text-center mt-10"><a href="#" class="btn-outline text-sm"><i data-lucide="github" class="w-4 h-4"></i> See More on GitHub</a></div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="relative py-24 md:py-32 px-6 section-clear">
+    <div class="max-w-6xl mx-auto">
+        <div class="reveal-on-scroll flex items-center gap-3 mb-3">
+            <span class="font-mono text-brand-blue text-sm">05.</span>
+            <span class="text-xs uppercase tracking-widest text-text-dim font-medium">Contact</span>
+            <div class="flex-1 h-px bg-white/5"></div>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-12 items-start">
+            <div>
+                <h2 class="reveal-on-scroll text-3xl md:text-4xl font-semibold tracking-tight mb-6">Let's build something <span class="gradient-text">great</span></h2>
+                <p class="reveal-on-scroll text-text-secondary leading-relaxed mb-8">I'm currently open to new opportunities. Whether you have a project in mind, a role to discuss, or just want to say hello — my inbox is always open.</p>
+                <div class="reveal-on-scroll space-y-3">
+                    <a href="mailto:alex@example.com" class="contact-link group">
+                        <div class="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center group-hover:bg-brand-blue/20 transition-colors"><i data-lucide="mail" class="w-4 h-4 text-brand-blue"></i></div>
+                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Email</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">alex@example.com</div></div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-text-dim ml-auto group-hover:text-brand-blue transition-colors"></i>
+                    </a>
+                    <a href="#" class="contact-link group">
+                        <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors"><i data-lucide="linkedin" class="w-4 h-4 text-text-secondary"></i></div>
+                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">LinkedIn</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">linkedin.com/in/alexchen</div></div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-text-dim ml-auto group-hover:text-brand-blue transition-colors"></i>
+                    </a>
+                    <a href="#" class="contact-link group">
+                        <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors"><i data-lucide="github" class="w-4 h-4 text-text-secondary"></i></div>
+                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">GitHub</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">github.com/alexchen</div></div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-text-dim ml-auto group-hover:text-brand-blue transition-colors"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="reveal-on-scroll">
+                <form id="contactForm" class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot bg-red-500/80"></div>
+                        <div class="terminal-dot bg-yellow-500/80"></div>
+                        <div class="terminal-dot bg-green-500/80"></div>
+                        <span class="ml-3 text-[11px] text-text-dim font-mono">send-message.sh</span>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div><label class="text-xs font-mono text-text-dim uppercase tracking-wider block mb-2">$ your_name</label><input type="text" placeholder="John Doe" class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-text-dim focus:outline-none focus:border-brand-blue/50 transition-colors font-mono"></div>
+                        <div><label class="text-xs font-mono text-text-dim uppercase tracking-wider block mb-2">$ your_email</label><input type="email" placeholder="john@company.com" class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-text-dim focus:outline-none focus:border-brand-blue/50 transition-colors font-mono"></div>
+                        <div><label class="text-xs font-mono text-text-dim uppercase tracking-wider block mb-2">$ message</label><textarea rows="4" placeholder="Let's talk about..." class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-text-dim focus:outline-none focus:border-brand-blue/50 transition-colors font-mono resize-none"></textarea></div>
+                        <button type="submit" class="btn-primary w-full justify-center font-mono text-xs"><i data-lucide="send" class="w-4 h-4"></i> Send Message</button>
+                        <div id="formMessage" class="hidden text-center text-sm font-mono py-2 rounded-lg"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="relative border-t border-white/5 py-8 px-6 section-clear">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-md bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center"><span class="font-mono text-brand-blue font-bold text-[10px]">&lt;/&gt;</span></div>
+            <span class="text-xs text-text-dim">Designed & built by Alex Chen</span>
+        </div>
+        <div class="text-xs text-text-dim font-mono"><span class="text-brand-blue">const</span> year = <span class="text-green-400">new Date().getFullYear()</span>; <span class="text-text-dim">// 2025</span></div>
+    </div>
+</footer>
+
+<script>
+// ======================== THREE.JS IMMERSIVE 3D FLY-THROUGH ========================
+(function(){
+    const canvas = document.getElementById('three-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x050505, 0.004);
+
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 250);
+    camera.position.set(0, 1, 38);
+
+    const C = {
+        blue: new THREE.Color('#0091FF'),
+        cyan: new THREE.Color('#00E5FF'),
+        gold: new THREE.Color('#FFC800'),
+        white: new THREE.Color('#FFFFFF'),
+        purple: new THREE.Color('#A855F7'),
+    };
+    const palette = [C.blue, C.cyan, C.gold, C.white, C.purple];
+
+    let targetScroll = 0, currentScroll = 0, scrollSpeed = 0, mouseX = 0, mouseY = 0;
+
+    window.addEventListener('scroll', () => {
+        const max = document.body.scrollHeight - window.innerHeight;
+        targetScroll = max > 0 ? window.scrollY / max : 0;
+    });
+    document.addEventListener('mousemove', e => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    function camPath(t) {
+        return {
+            z: 38 - t * 130,
+            x: Math.sin(t * Math.PI * 1.4) * 7,
+            y: Math.sin(t * Math.PI * 0.6 + 0.3) * 3.5 + 1,
+        };
+    }
+
+    // ====== TUNNEL RINGS — PRIMARY ======
+    const rings = [];
+    for (let i = 0; i < 28; i++) {
+        const t = i / 27;
+        const z = 32 - t * 140;
+        const r = 5 + Math.sin(i * 0.7) * 2.5 + Math.cos(i * 0.3) * 1.5;
+        const geo = new THREE.TorusGeometry(Math.max(1, r), 0.025, 6, 80);
+        const color = new THREE.Color().setHSL((0.55 + t * 0.12) % 1, 0.8, 0.55);
+        const mat = new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: 0.06 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(Math.sin(i * 0.9) * 1.5, Math.cos(i * 0.6) * 1, z);
+        mesh.rotation.x = Math.PI / 2;
+        mesh.userData = { baseZ: z, rotSpeed: (Math.random() - 0.5) * 0.004 };
+        scene.add(mesh);
+        rings.push(mesh);
+    }
+
+    // ====== TUNNEL RINGS — SECONDARY ======
+    const rings2 = [];
+    for (let i = 0; i < 18; i++) {
+        const t = i / 17;
+        const z = 28 - t * 135;
+        const r = 3 + Math.sin(i * 1.1) * 1.5;
+        const geo = new THREE.TorusGeometry(Math.max(1, r), 0.015, 4, 50);
+        const color = new THREE.Color().setHSL((0.12 + t * 0.1) % 1, 0.7, 0.5);
+        const mat = new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: 0.04 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(Math.cos(i * 1.3) * 2, Math.sin(i * 0.8) * 2, z);
+        mesh.rotation.x = Math.PI / 2 + 0.3;
+        mesh.rotation.y = i * 0.5;
+        mesh.userData = { baseZ: z, rotSpeed: (Math.random() - 0.5) * 0.006 };
+        scene.add(mesh);
+        rings2.push(mesh);
+    }
+
+    // ====== PARTICLES ======
+    const pCount = 2200;
+    const pGeo = new THREE.BufferGeometry();
+    const pPos = new Float32Array(pCount * 3);
+    const pCol = new Float32Array(pCount * 3);
+    for (let i = 0; i < pCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.pow(Math.random(), 0.6) * 35;
+        pPos[i*3]   = Math.cos(angle) * r;
+        pPos[i*3+1] = Math.sin(angle) * r;
+        pPos[i*3+2] = 55 - Math.random() * 160;
+        const c = palette[Math.floor(Math.random() * palette.length)];
+        pCol[i*3] = c.r; pCol[i*3+1] = c.g; pCol[i*3+2] = c.b;
+    }
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
+    const pMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+    scene.add(new THREE.Points(pGeo, pMat));
+
+    // ====== STREAMING PARTICLES ======
+    const sCount = 600;
+    const sGeo = new THREE.BufferGeometry();
+    const sPos = new Float32Array(sCount * 3);
+    for (let i = 0; i < sCount; i++) {
+        sPos[i*3]   = (Math.random() - 0.5) * 14;
+        sPos[i*3+1] = (Math.random() - 0.5) * 14;
+        sPos[i*3+2] = Math.random() * -60;
+    }
+    sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+    const sMat = new THREE.PointsMaterial({ size: 0.06, color: C.blue, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+    const streamP = new THREE.Points(sGeo, sMat);
+    scene.add(streamP);
+
+    // ====== HERO — DOUBLE ICOSAHEDRON ======
+    const heroIco = new THREE.Mesh(new THREE.IcosahedronGeometry(4, 1), new THREE.MeshBasicMaterial({ color: C.blue, wireframe: true, transparent: true, opacity: 0.2 }));
+    heroIco.position.set(0, 0, 26);
+    scene.add(heroIco);
+    const heroIcoIn = new THREE.Mesh(new THREE.IcosahedronGeometry(2.5, 0), new THREE.MeshBasicMaterial({ color: C.cyan, wireframe: true, transparent: true, opacity: 0.15 }));
+    heroIcoIn.position.copy(heroIco.position);
+    scene.add(heroIcoIn);
+
+    // ====== ABOUT — SPHERE ======
+    const aboutSph = new THREE.Mesh(new THREE.SphereGeometry(3.5, 24, 16), new THREE.MeshBasicMaterial({ color: C.cyan, wireframe: true, transparent: true, opacity: 0.12 }));
+    aboutSph.position.set(0, 0, 12);
+    scene.add(aboutSph);
+
+    // ====== SKILLS — CUBE GRID ======
+    const cubeGrid = new THREE.Group();
+    const cubeGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+    for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
+        const hue = ((x+1)*3+(y+1)*3+(z+1)) / 27;
+        const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.55+hue*0.15, 0.8, 0.5), wireframe: true, transparent: true, opacity: 0.2 });
+        const c = new THREE.Mesh(cubeGeo, mat);
+        c.position.set(x*1.4, y*1.4, z*1.4);
+        c.userData.rs = { x:(Math.random()-0.5)*0.02, y:(Math.random()-0.5)*0.02, z:(Math.random()-0.5)*0.02 };
+        cubeGrid.add(c);
+    }
+    cubeGrid.position.set(0, 0, -3);
+    scene.add(cubeGrid);
+
+    // ====== EXPERIENCE — HELIX ======
+    const helixG = new THREE.Group();
+    const hDotGeo = new THREE.SphereGeometry(0.18, 6, 6);
+    for (let i = 0; i < 30; i++) {
+        const t = i / 30, angle = t * Math.PI * 6, y = (t - 0.5) * 12, r = 2.5;
+        const d1 = new THREE.Mesh(hDotGeo, new THREE.MeshBasicMaterial({ color: C.gold, transparent: true, opacity: 0.35 }));
+        d1.position.set(Math.cos(angle)*r, y, Math.sin(angle)*r);
+        helixG.add(d1);
+        const d2 = new THREE.Mesh(hDotGeo, new THREE.MeshBasicMaterial({ color: C.blue, transparent: true, opacity: 0.25 }));
+        d2.position.set(Math.cos(angle+Math.PI)*r, y, Math.sin(angle+Math.PI)*r);
+        helixG.add(d2);
+        if (i % 3 === 0) {
+            const lg = new THREE.BufferGeometry().setFromPoints([d1.position.clone(), d2.position.clone()]);
+            helixG.add(new THREE.Line(lg, new THREE.LineBasicMaterial({ color: C.white, transparent: true, opacity: 0.06 })));
+        }
+    }
+    helixG.position.set(0, 0, -22);
+    scene.add(helixG);
+
+    // ====== PROJECTS — CLUSTER ======
+    const projG = new THREE.Group();
+    const projGeos = [new THREE.OctahedronGeometry(1.2,0), new THREE.TetrahedronGeometry(1.3,0), new THREE.DodecahedronGeometry(1,0), new THREE.IcosahedronGeometry(0.9,0), new THREE.TorusKnotGeometry(0.7,0.2,40,8), new THREE.OctahedronGeometry(0.8,1)];
+    const projPos = [[-3,1.5,0],[2.5,2,1],[-1,-2,-1],[3,-1.5,-0.5],[-2.5,0,1.5],[0.5,2.5,-1.5]];
+    projGeos.forEach((g,i) => {
+        const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: palette[i%palette.length], wireframe: true, transparent: true, opacity: 0.18 }));
+        m.position.set(...projPos[i]);
+        m.userData.rs = { x:(Math.random()-0.5)*0.01, y:(Math.random()-0.5)*0.01 };
+        projG.add(m);
+    });
+    projG.position.set(0, 0, -42);
+    scene.add(projG);
+
+    // ====== CONTACT — DODECAHEDRON + RING ======
+    const ctSph = new THREE.Mesh(new THREE.DodecahedronGeometry(4, 1), new THREE.MeshBasicMaterial({ color: C.gold, wireframe: true, transparent: true, opacity: 0.15 }));
+    ctSph.position.set(0, 0, -62);
+    scene.add(ctSph);
+    const ctRing = new THREE.Mesh(new THREE.TorusGeometry(5.5, 0.03, 8, 100), new THREE.MeshBasicMaterial({ color: C.gold, wireframe: true, transparent: true, opacity: 0.1 }));
+    ctRing.position.copy(ctSph.position);
+    ctRing.rotation.x = Math.PI / 2;
+    scene.add(ctRing);
+
+    // ====== FLOATING DEBRIS ======
+    const floaters = [];
+    const fGeos = [new THREE.TetrahedronGeometry(0.4,0), new THREE.OctahedronGeometry(0.3,0), new THREE.BoxGeometry(0.5,0.5,0.5)];
+    for (let i = 0; i < 40; i++) {
+        const m = new THREE.Mesh(fGeos[Math.floor(Math.random()*3)], new THREE.MeshBasicMaterial({ color: palette[Math.floor(Math.random()*palette.length)], wireframe: true, transparent: true, opacity: 0.08+Math.random()*0.07 }));
+        m.position.set((Math.random()-0.5)*50, (Math.random()-0.5)*30, 40-Math.random()*140);
+        m.userData = { rs:{x:(Math.random()-0.5)*0.01,y:(Math.random()-0.5)*0.01,z:(Math.random()-0.5)*0.005}, fOff:Math.random()*Math.PI*2, fSpd:Math.random()*0.003+0.001 };
+        scene.add(m);
+        floaters.push(m);
+    }
+
+    // ====== ENERGY BEAMS ======
+    for (let i = 0; i < 6; i++) {
+        const a = (i/6)*Math.PI*2, r = 8+Math.random()*4;
+        const pts = [new THREE.Vector3(Math.cos(a)*r, Math.sin(a)*r, 60), new THREE.Vector3(Math.cos(a)*r*0.3, Math.sin(a)*r*0.3, -100)];
+        scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: palette[i%palette.length], transparent: true, opacity: 0.03, blending: THREE.AdditiveBlending })));
+    }
+
+    // ====== ANIMATE ======
+    const clock = new THREE.Clock();
+    function animate() {
+        requestAnimationFrame(animate);
+        const time = clock.getElapsedTime();
+
+        const prevScroll = currentScroll;
+        currentScroll += (targetScroll - currentScroll) * 0.06;
+        scrollSpeed = Math.abs(currentScroll - prevScroll) * 60;
+
+        const cp = camPath(currentScroll);
+        const lp = camPath(Math.min(currentScroll + 0.07, 1));
+        camera.position.x = cp.x + mouseX * 2.5 * (1 - scrollSpeed * 2);
+        camera.position.y = cp.y - mouseY * 2 * (1 - scrollSpeed * 2);
+        camera.position.z = cp.z;
+        camera.lookAt(lp.x * 0.7, lp.y * 0.7, lp.z);
+
+        document.getElementById('scrollBar').style.width = (currentScroll * 100) + '%';
+        camera.fov = 65 + scrollSpeed * 80;
+        camera.updateProjectionMatrix();
+        scene.fog.density = 0.004 - scrollSpeed * 0.015;
+
+        // Rings
+        rings.forEach(r => {
+            r.rotation.z += r.userData.rotSpeed + scrollSpeed * 0.3;
+            const d = Math.abs(camera.position.z - r.userData.baseZ);
+            const p = Math.max(0, 1 - d / 18);
+            r.material.opacity = 0.04 + p * 0.22 + scrollSpeed * 0.5;
+            r.scale.setScalar(1 + p * 0.15 + scrollSpeed * 0.8);
+        });
+        rings2.forEach(r => {
+            r.rotation.z += r.userData.rotSpeed + scrollSpeed * 0.2;
+            r.rotation.x += 0.001;
+            const d = Math.abs(camera.position.z - r.userData.baseZ);
+            r.material.opacity = 0.02 + Math.max(0, 1 - d/15) * 0.15 + scrollSpeed * 0.3;
+        });
+
+        // Particles
+        pMat.opacity = 0.6 + scrollSpeed * 2;
+        pMat.size = 0.12 + scrollSpeed * 0.5;
+
+        // Stream particles
+        const sp = streamP.geometry.attributes.position.array;
+        for (let i = 0; i < sCount; i++) {
+            sp[i*3+2] += scrollSpeed * 3 + 0.02;
+            if (sp[i*3+2] > camera.position.z + 15) {
+                sp[i*3+2] = camera.position.z - 40 - Math.random() * 20;
+                sp[i*3] = (Math.random()-0.5)*14;
+                sp[i*3+1] = (Math.random()-0.5)*14;
+            }
+        }
+        streamP.geometry.attributes.position.needsUpdate = true;
+        sMat.opacity = 0.2 + scrollSpeed * 3;
+
+        // Hero icosahedron
+        heroIco.rotation.x = time * 0.15; heroIco.rotation.y = time * 0.2;
+        heroIcoIn.rotation.x = -time * 0.2; heroIcoIn.rotation.z = time * 0.15;
+        const hd = Math.abs(camera.position.z - 26);
+        const hp = Math.max(0, 1 - hd / 20);
+        heroIco.material.opacity = 0.08 + hp * 0.25;
+        heroIcoIn.material.opacity = 0.06 + hp * 0.2;
+        heroIco.scale.setScalar(1 + Math.sin(time * 0.8) * 0.05);
+        heroIcoIn.scale.setScalar(1 + Math.cos(time * 0.6) * 0.08);
+
+        // About sphere
+        aboutSph.rotation.y = time * 0.12;
+        aboutSph.rotation.x = Math.sin(time * 0.3) * 0.2;
+        const ad = Math.abs(camera.position.z - 12);
+        aboutSph.material.opacity = 0.05 + Math.max(0, 1 - ad/18) * 0.2;
+        aboutSph.scale.setScalar(1 + Math.sin(time * 0.5) * 0.03);
+
+        // Cube grid
+        cubeGrid.rotation.y = time * 0.1;
+        cubeGrid.rotation.x = Math.sin(time * 0.2) * 0.15;
+        const cd = Math.abs(camera.position.z - (-3));
+        const cpr = Math.max(0, 1 - cd/18);
+        cubeGrid.children.forEach(c => {
+            c.rotation.x += c.userData.rs.x + scrollSpeed * 0.5;
+            c.rotation.y += c.userData.rs.y + scrollSpeed * 0.5;
+            c.material.opacity = 0.08 + cpr * 0.3 + scrollSpeed * 0.3;
+        });
+
+        // Helix
+        helixG.rotation.y = time * 0.15;
+        const ed = Math.abs(camera.position.z - (-22));
+        const epr = Math.max(0, 1 - ed/18);
+        helixG.children.forEach(ch => {
+            if (ch.isMesh) { ch.material.opacity = (ch.material.color.equals(C.gold)?0.15:0.1) + epr*0.3 + scrollSpeed*0.2; ch.scale.setScalar(1+epr*0.3); }
+        });
+
+        // Projects
+        const pd = Math.abs(camera.position.z - (-42));
+        const ppr = Math.max(0, 1 - pd/20);
+        projG.children.forEach(m => {
+            m.rotation.x += m.userData.rs.x + scrollSpeed * 0.4;
+            m.rotation.y += m.userData.rs.y + scrollSpeed * 0.4;
+            m.material.opacity = 0.08 + ppr * 0.25 + scrollSpeed * 0.3;
+        });
+        projG.rotation.y = time * 0.08;
+
+        // Contact
+        ctSph.rotation.y = time * 0.1; ctSph.rotation.x = time * 0.07;
+        const ctd = Math.abs(camera.position.z - (-62));
+        ctSph.material.opacity = 0.06 + Math.max(0, 1-ctd/20)*0.2;
+        ctSph.scale.setScalar(1 + Math.sin(time*0.4)*0.04);
+        ctRing.rotation.z = time * 0.08;
+        ctRing.material.opacity = 0.04 + Math.max(0, 1-ctd/20)*0.15;
+
+        // Floaters
+        floaters.forEach(f => {
+            f.rotation.x += f.userData.rs.x; f.rotation.y += f.userData.rs.y; f.rotation.z += f.userData.rs.z;
+            f.position.y += Math.sin(time*f.userData.fSpd*100+f.userData.fOff)*0.003;
+            const fd = Math.abs(camera.position.z - f.position.z);
+            f.material.opacity = 0.05 + Math.max(0,1-fd/20)*0.15 + scrollSpeed*0.2;
+        });
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+})();
+
+// ======================== SCROLL REVEAL ========================
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('is-visible'), i * 60);
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+// ======================== NAVBAR ========================
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        navbar.style.background = 'rgba(5,5,5,0.5)';
+        navbar.style.backdropFilter = 'blur(16px)';
+        navbar.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+    } else {
+        navbar.style.background = 'transparent';
+        navbar.style.backdropFilter = 'none';
+        navbar.style.borderBottom = 'none';
+    }
+});
+
+function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('hidden'); }
+
+// ======================== COUNTERS ========================
+const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const el = entry.target, target = parseInt(el.dataset.count), suffix = el.dataset.suffix || '+';
+            let cur = 0; const inc = target / 35;
+            const timer = setInterval(() => { cur += inc; if (cur >= target) { cur = target; clearInterval(timer); } el.textContent = Math.floor(cur) + suffix; }, 40);
+            counterObs.unobserve(el);
+        }
+    });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+
+// ======================== SKILL BARS ========================
+const skillObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.skill-bar').forEach(bar => { const w = bar.style.getPropertyValue('--w'); bar.style.setProperty('--w','0%'); setTimeout(() => bar.style.setProperty('--w',w), 100); });
+            skillObs.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.3 });
+document.querySelectorAll('#skills .card-hover').forEach(el => skillObs.observe(el));
+
+// ======================== FORM ========================
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const msg = document.getElementById('formMessage'), inputs = this.querySelectorAll('input,textarea');
+    if ([...inputs].some(i => !i.value.trim())) {
+        msg.className = 'text-center text-sm font-mono py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20'; msg.textContent = '> error: please fill in all fields'; msg.classList.remove('hidden'); return;
+    }
+    msg.className = 'text-center text-sm font-mono py-2 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20'; msg.textContent = '> success: message sent! (demo)'; msg.classList.remove('hidden');
+    inputs.forEach(i => i.value = '');
+    setTimeout(() => msg.classList.add('hidden'), 4000);
+});
+
+// ======================== SMOOTH SCROLL ========================
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) { e.preventDefault(); const t = document.querySelector(this.getAttribute('href')); if (t) t.scrollIntoView({ behavior:'smooth', block:'start' }); });
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>
