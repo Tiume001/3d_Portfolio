@@ -1,9 +1,9 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alex Chen — Full-Stack Developer</title>
+    <title>Mattia Scarpa — Full-Stack Developer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,7 +16,7 @@
                     colors: {
                         bg:'#050505', surface:'#121212', card:'#0A0A0A',
                         'brand-blue':'#0091FF','brand-gold':'#FFC800','brand-cyan':'#00E5FF',
-                        'text-primary':'#FFFFFF','text-secondary':'#A1A1AA','text-dim':'#52525B',
+                        'text-primary':'#FFFFFF','text-secondary':'#D4D4D8','text-dim':'#71717A',
                     }
                 }
             }
@@ -29,8 +29,8 @@
         ::-webkit-scrollbar-thumb{background:rgba(0,145,255,0.3);border-radius:3px}
         ::-webkit-scrollbar-thumb:hover{background:rgba(0,145,255,0.6)}
         #three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-        .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(5,5,5,0.55) 100%)}
-        .god-ray{position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 42%,rgba(0,145,255,0.012) 46%,rgba(0,229,255,0.02) 50%,rgba(0,145,255,0.012) 54%,transparent 58%);animation:godRayRotate 25s linear infinite;pointer-events:none;z-index:2}
+        .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(5,5,5,0.75) 100%)}
+        .god-ray{position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 42%,rgba(0,145,255,0.008) 46%,rgba(0,229,255,0.015) 50%,rgba(0,145,255,0.008) 54%,transparent 58%);animation:godRayRotate 30s linear infinite;pointer-events:none;z-index:2}
         @keyframes godRayRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
         #scrollBar{position:fixed;top:0;left:0;height:2px;z-index:100;background:linear-gradient(to right,#0091FF,#00E5FF,#FFC800);width:0%;transition:width 0.1s linear;box-shadow:0 0 12px rgba(0,145,255,0.6)}
         .reveal-on-scroll{opacity:0;transform:translateY(30px);filter:blur(5px);transition:all 1s cubic-bezier(0.16,1,0.3,1)}
@@ -41,16 +41,16 @@
         /* CARDS — glass that reveals the 3D behind */
         .card-hover{
             transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
-            border:1px solid rgba(255,255,255,0.06);
-            background:rgba(5,5,5,0.35);
-            backdrop-filter:blur(8px);
-            -webkit-backdrop-filter:blur(8px);
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(15,15,15,0.7);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
         }
         .card-hover:hover{
-            border-color:rgba(0,145,255,0.3);
+            border-color:rgba(0,145,255,0.4);
             transform:translateY(-4px);
-            box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px rgba(0,145,255,0.08);
-            background:rgba(5,5,5,0.45);
+            box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px rgba(0,145,255,0.12);
+            background:rgba(20,20,20,0.8);
         }
 
         /* SECTIONS — fully transparent, 3D bleeds through everywhere */
@@ -61,12 +61,12 @@
 
         /* Terminal — slightly more opaque for code readability */
         .terminal{
-            background:rgba(5,5,5,0.6);
-            border:1px solid rgba(255,255,255,0.08);
+            background:rgba(10,10,10,0.85);
+            border:1px solid rgba(255,255,255,0.12);
             border-radius:12px;
             overflow:hidden;
-            backdrop-filter:blur(12px);
-            -webkit-backdrop-filter:blur(12px);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
         }
         .terminal-header{display:flex;gap:6px;padding:12px 16px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06)}
         .terminal-dot{width:10px;height:10px;border-radius:50%}
@@ -78,8 +78,8 @@
         .skill-bar.gold::after{background:linear-gradient(to right,#FFC800,#0091FF)}
         .skill-bar.cyan::after{background:linear-gradient(to right,#00E5FF,#0091FF)}
 
-        .tag{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#A1A1AA;transition:all 0.3s}
-        .tag:hover{border-color:rgba(0,145,255,0.4);color:#0091FF;background:rgba(0,145,255,0.08)}
+        .tag{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,0.12);background:rgba(30,30,30,0.6);color:#D4D4D8;transition:all 0.3s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+        .tag:hover{border-color:rgba(0,145,255,0.4);color:#0091FF;background:rgba(0,145,255,0.12)}
 
         .timeline-line{position:absolute;left:23px;top:40px;bottom:0;width:1px;background:linear-gradient(to bottom,rgba(0,145,255,0.4),rgba(0,145,255,0.05))}
         .status-dot{width:12px;height:12px;border-radius:50%;background:#22C55E;position:relative}
@@ -103,34 +103,35 @@
         /* Metric cards — very transparent */
         .metric-card{
             text-align:center;padding:24px;border-radius:12px;
-            border:1px solid rgba(255,255,255,0.06);
-            background:rgba(5,5,5,0.3);
-            backdrop-filter:blur(6px);
-            -webkit-backdrop-filter:blur(6px);
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(15,15,15,0.7);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
             transition:all 0.3s;
         }
-        .metric-card:hover{border-color:rgba(0,145,255,0.2);background:rgba(0,145,255,0.05)}
+        .metric-card:hover{border-color:rgba(0,145,255,0.3);background:rgba(0,145,255,0.15)}
 
         /* Contact links */
         .contact-link{
             display:flex;align-items:center;gap:16px;padding:16px;border-radius:12px;
-            border:1px solid rgba(255,255,255,0.06);
-            background:rgba(5,5,5,0.3);
-            backdrop-filter:blur(6px);
-            -webkit-backdrop-filter:blur(6px);
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(15,15,15,0.7);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
             transition:all 0.3s;
         }
-        .contact-link:hover{border-color:rgba(0,145,255,0.3);background:rgba(0,145,255,0.06)}
+        .contact-link:hover{border-color:rgba(0,145,255,0.4);background:rgba(0,145,255,0.15)}
 
         /* Education card */
         .edu-card{
             display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:24px;border-radius:16px;
-            border:1px solid rgba(255,255,255,0.06);
-            background:rgba(5,5,5,0.3);
-            backdrop-filter:blur(6px);
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(15,15,15,0.7);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
             transition:all 0.3s;
         }
-        .edu-card:hover{border-color:rgba(0,145,255,0.2)}
+        .edu-card:hover{border-color:rgba(0,145,255,0.4);background:rgba(20,20,20,0.8)}
 
         .grid-pattern{background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(circle at center,black 40%,transparent 80%)}
         @media(max-width:768px){
@@ -159,7 +160,7 @@
             <div class="w-9 h-9 rounded-lg bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center group-hover:bg-brand-blue/30 transition-colors">
                 <span class="font-mono text-brand-blue font-bold text-sm">&lt;/&gt;</span>
             </div>
-            <span class="font-semibold text-sm tracking-tight">alex.dev</span>
+            <span class="font-semibold text-sm tracking-tight">mattia.dev</span>
         </a>
         <div class="nav-links-desktop flex items-center gap-8">
             <a href="#about" class="nav-link">About</a>
@@ -194,7 +195,7 @@
             <span class="text-xs text-text-secondary font-mono">Available for opportunities</span>
         </div>
         <h1 class="reveal-on-scroll hero-title text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter leading-[0.95] mb-6">
-            Hi, I'm <span class="gradient-text">Alex Chen</span>
+            Hi, I'm <span class="gradient-text">Mattia Scarpa</span>
         </h1>
         <div class="reveal-on-scroll flex items-center justify-center gap-3 mb-8">
             <span class="text-2xl md:text-3xl font-light text-text-secondary tracking-tight">Full-Stack Developer</span>
@@ -461,19 +462,19 @@
                 <h2 class="reveal-on-scroll text-3xl md:text-4xl font-semibold tracking-tight mb-6">Let's build something <span class="gradient-text">great</span></h2>
                 <p class="reveal-on-scroll text-text-secondary leading-relaxed mb-8">I'm currently open to new opportunities. Whether you have a project in mind, a role to discuss, or just want to say hello — my inbox is always open.</p>
                 <div class="reveal-on-scroll space-y-3">
-                    <a href="mailto:alex@example.com" class="contact-link group">
+                    <a href="mailto:info@mattiascarpa.it" class="contact-link group">
                         <div class="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center group-hover:bg-brand-blue/20 transition-colors"><i data-lucide="mail" class="w-4 h-4 text-brand-blue"></i></div>
-                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Email</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">alex@example.com</div></div>
+                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">Email</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">info@mattiascarpa.it</div></div>
                         <i data-lucide="arrow-up-right" class="w-4 h-4 text-text-dim ml-auto group-hover:text-brand-blue transition-colors"></i>
                     </a>
                     <a href="#" class="contact-link group">
                         <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors"><i data-lucide="linkedin" class="w-4 h-4 text-text-secondary"></i></div>
-                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">LinkedIn</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">linkedin.com/in/alexchen</div></div>
+                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">LinkedIn</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">linkedin.com/in/mattiascarpa</div></div>
                         <i data-lucide="arrow-up-right" class="w-4 h-4 text-text-dim ml-auto group-hover:text-brand-blue transition-colors"></i>
                     </a>
                     <a href="#" class="contact-link group">
                         <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors"><i data-lucide="github" class="w-4 h-4 text-text-secondary"></i></div>
-                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">GitHub</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">github.com/alexchen</div></div>
+                        <div><div class="text-xs text-text-dim font-mono uppercase tracking-wider">GitHub</div><div class="text-sm text-text-secondary group-hover:text-white transition-colors">github.com/mattiascarpa</div></div>
                         <i data-lucide="arrow-up-right" class="w-4 h-4 text-text-dim ml-auto group-hover:text-brand-blue transition-colors"></i>
                     </a>
                 </div>
@@ -503,7 +504,7 @@
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-2.5">
             <div class="w-7 h-7 rounded-md bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center"><span class="font-mono text-brand-blue font-bold text-[10px]">&lt;/&gt;</span></div>
-            <span class="text-xs text-text-dim">Designed & built by Alex Chen</span>
+            <span class="text-xs text-text-dim">Designed & built by Mattia Scarpa</span>
         </div>
         <div class="text-xs text-text-dim font-mono"><span class="text-brand-blue">const</span> year = <span class="text-green-400">new Date().getFullYear()</span>; <span class="text-text-dim">// 2025</span></div>
     </div>
@@ -551,158 +552,176 @@
         };
     }
 
-    // ====== TUNNEL RINGS — PRIMARY ======
-    const rings = [];
-    for (let i = 0; i < 28; i++) {
-        const t = i / 27;
-        const z = 32 - t * 140;
-        const r = 5 + Math.sin(i * 0.7) * 2.5 + Math.cos(i * 0.3) * 1.5;
-        const geo = new THREE.TorusGeometry(Math.max(1, r), 0.025, 6, 80);
-        const color = new THREE.Color().setHSL((0.55 + t * 0.12) % 1, 0.8, 0.55);
-        const mat = new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: 0.06 });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(Math.sin(i * 0.9) * 1.5, Math.cos(i * 0.6) * 1, z);
-        mesh.rotation.x = Math.PI / 2;
-        mesh.userData = { baseZ: z, rotSpeed: (Math.random() - 0.5) * 0.004 };
-        scene.add(mesh);
-        rings.push(mesh);
-    }
+    // ====== LIGHTING ======
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+    
+    const sunLight = new THREE.DirectionalLight(0xffeedd, 1.5);
+    sunLight.position.set(20, 30, 20);
+    scene.add(sunLight);
 
-    // ====== TUNNEL RINGS — SECONDARY ======
-    const rings2 = [];
-    for (let i = 0; i < 18; i++) {
-        const t = i / 17;
-        const z = 28 - t * 135;
-        const r = 3 + Math.sin(i * 1.1) * 1.5;
-        const geo = new THREE.TorusGeometry(Math.max(1, r), 0.015, 4, 50);
-        const color = new THREE.Color().setHSL((0.12 + t * 0.1) % 1, 0.7, 0.5);
-        const mat = new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: 0.04 });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(Math.cos(i * 1.3) * 2, Math.sin(i * 0.8) * 2, z);
-        mesh.rotation.x = Math.PI / 2 + 0.3;
-        mesh.rotation.y = i * 0.5;
-        mesh.userData = { baseZ: z, rotSpeed: (Math.random() - 0.5) * 0.006 };
-        scene.add(mesh);
-        rings2.push(mesh);
-    }
+    const backLight = new THREE.DirectionalLight(0x0091FF, 0.8);
+    backLight.position.set(-20, -20, -20);
+    scene.add(backLight);
 
-    // ====== PARTICLES ======
-    const pCount = 2200;
-    const pGeo = new THREE.BufferGeometry();
-    const pPos = new Float32Array(pCount * 3);
-    const pCol = new Float32Array(pCount * 3);
-    for (let i = 0; i < pCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const r = Math.pow(Math.random(), 0.6) * 35;
-        pPos[i*3]   = Math.cos(angle) * r;
-        pPos[i*3+1] = Math.sin(angle) * r;
-        pPos[i*3+2] = 55 - Math.random() * 160;
-        const c = palette[Math.floor(Math.random() * palette.length)];
-        pCol[i*3] = c.r; pCol[i*3+1] = c.g; pCol[i*3+2] = c.b;
-    }
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
-    const pMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, sizeAttenuation: true });
-    scene.add(new THREE.Points(pGeo, pMat));
+    // ====== GALAXY STARFIELD ======
+    const starsCount = 12000;
+    const starsGeo = new THREE.BufferGeometry();
+    const starsPos = new Float32Array(starsCount * 3);
+    const starsCol = new Float32Array(starsCount * 3);
+    
+    for(let i=0; i<starsCount; i++) {
+        // Spiral galaxy distribution
+        const radius = Math.random() * 100;
+        const branchAngle = (i % 3) * ((Math.PI * 2) / 3);
+        const spinAngle = radius * 0.15;
+        
+        const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 8;
+        const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 8;
+        const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 8;
 
-    // ====== STREAMING PARTICLES ======
-    const sCount = 600;
-    const sGeo = new THREE.BufferGeometry();
-    const sPos = new Float32Array(sCount * 3);
-    for (let i = 0; i < sCount; i++) {
-        sPos[i*3]   = (Math.random() - 0.5) * 14;
-        sPos[i*3+1] = (Math.random() - 0.5) * 14;
-        sPos[i*3+2] = Math.random() * -60;
-    }
-    sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
-    const sMat = new THREE.PointsMaterial({ size: 0.06, color: C.blue, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, sizeAttenuation: true });
-    const streamP = new THREE.Points(sGeo, sMat);
-    scene.add(streamP);
+        starsPos[i*3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+        starsPos[i*3+1] = randomY;
+        starsPos[i*3+2] = Math.sin(branchAngle + spinAngle) * radius + randomZ - 50; 
 
-    // ====== HERO — DOUBLE ICOSAHEDRON ======
-    const heroIco = new THREE.Mesh(new THREE.IcosahedronGeometry(4, 1), new THREE.MeshBasicMaterial({ color: C.blue, wireframe: true, transparent: true, opacity: 0.2 }));
-    heroIco.position.set(0, 0, 26);
-    scene.add(heroIco);
-    const heroIcoIn = new THREE.Mesh(new THREE.IcosahedronGeometry(2.5, 0), new THREE.MeshBasicMaterial({ color: C.cyan, wireframe: true, transparent: true, opacity: 0.15 }));
-    heroIcoIn.position.copy(heroIco.position);
-    scene.add(heroIcoIn);
-
-    // ====== ABOUT — SPHERE ======
-    const aboutSph = new THREE.Mesh(new THREE.SphereGeometry(3.5, 24, 16), new THREE.MeshBasicMaterial({ color: C.cyan, wireframe: true, transparent: true, opacity: 0.12 }));
-    aboutSph.position.set(0, 0, 12);
-    scene.add(aboutSph);
-
-    // ====== SKILLS — CUBE GRID ======
-    const cubeGrid = new THREE.Group();
-    const cubeGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-    for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
-        const hue = ((x+1)*3+(y+1)*3+(z+1)) / 27;
-        const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.55+hue*0.15, 0.8, 0.5), wireframe: true, transparent: true, opacity: 0.2 });
-        const c = new THREE.Mesh(cubeGeo, mat);
-        c.position.set(x*1.4, y*1.4, z*1.4);
-        c.userData.rs = { x:(Math.random()-0.5)*0.02, y:(Math.random()-0.5)*0.02, z:(Math.random()-0.5)*0.02 };
-        cubeGrid.add(c);
-    }
-    cubeGrid.position.set(0, 0, -3);
-    scene.add(cubeGrid);
-
-    // ====== EXPERIENCE — HELIX ======
-    const helixG = new THREE.Group();
-    const hDotGeo = new THREE.SphereGeometry(0.18, 6, 6);
-    for (let i = 0; i < 30; i++) {
-        const t = i / 30, angle = t * Math.PI * 6, y = (t - 0.5) * 12, r = 2.5;
-        const d1 = new THREE.Mesh(hDotGeo, new THREE.MeshBasicMaterial({ color: C.gold, transparent: true, opacity: 0.35 }));
-        d1.position.set(Math.cos(angle)*r, y, Math.sin(angle)*r);
-        helixG.add(d1);
-        const d2 = new THREE.Mesh(hDotGeo, new THREE.MeshBasicMaterial({ color: C.blue, transparent: true, opacity: 0.25 }));
-        d2.position.set(Math.cos(angle+Math.PI)*r, y, Math.sin(angle+Math.PI)*r);
-        helixG.add(d2);
-        if (i % 3 === 0) {
-            const lg = new THREE.BufferGeometry().setFromPoints([d1.position.clone(), d2.position.clone()]);
-            helixG.add(new THREE.Line(lg, new THREE.LineBasicMaterial({ color: C.white, transparent: true, opacity: 0.06 })));
+        // Mix colors: warm center, cool edges
+        const mixedColor = new THREE.Color();
+        if(radius < 20) {
+            mixedColor.setHSL(0.1 + Math.random()*0.05, 0.4, Math.random() * 0.4 + 0.4); 
+        } else {
+            mixedColor.setHSL(0.55 + Math.random() * 0.15, 0.3, Math.random() * 0.4 + 0.2); 
         }
+        starsCol[i*3] = mixedColor.r; starsCol[i*3+1] = mixedColor.g; starsCol[i*3+2] = mixedColor.b;
     }
-    helixG.position.set(0, 0, -22);
-    scene.add(helixG);
-
-    // ====== PROJECTS — CLUSTER ======
-    const projG = new THREE.Group();
-    const projGeos = [new THREE.OctahedronGeometry(1.2,0), new THREE.TetrahedronGeometry(1.3,0), new THREE.DodecahedronGeometry(1,0), new THREE.IcosahedronGeometry(0.9,0), new THREE.TorusKnotGeometry(0.7,0.2,40,8), new THREE.OctahedronGeometry(0.8,1)];
-    const projPos = [[-3,1.5,0],[2.5,2,1],[-1,-2,-1],[3,-1.5,-0.5],[-2.5,0,1.5],[0.5,2.5,-1.5]];
-    projGeos.forEach((g,i) => {
-        const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: palette[i%palette.length], wireframe: true, transparent: true, opacity: 0.18 }));
-        m.position.set(...projPos[i]);
-        m.userData.rs = { x:(Math.random()-0.5)*0.01, y:(Math.random()-0.5)*0.01 };
-        projG.add(m);
+    starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+    starsGeo.setAttribute('color', new THREE.BufferAttribute(starsCol, 3));
+    const starsMat = new THREE.PointsMaterial({
+        size: 0.15,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true
     });
-    projG.position.set(0, 0, -42);
-    scene.add(projG);
+    const galaxy = new THREE.Points(starsGeo, starsMat);
+    galaxy.rotation.x = Math.PI * 0.1;
+    scene.add(galaxy);
 
-    // ====== CONTACT — DODECAHEDRON + RING ======
-    const ctSph = new THREE.Mesh(new THREE.DodecahedronGeometry(4, 1), new THREE.MeshBasicMaterial({ color: C.gold, wireframe: true, transparent: true, opacity: 0.15 }));
-    ctSph.position.set(0, 0, -62);
-    scene.add(ctSph);
-    const ctRing = new THREE.Mesh(new THREE.TorusGeometry(5.5, 0.03, 8, 100), new THREE.MeshBasicMaterial({ color: C.gold, wireframe: true, transparent: true, opacity: 0.1 }));
-    ctRing.position.copy(ctSph.position);
-    ctRing.rotation.x = Math.PI / 2;
-    scene.add(ctRing);
+    // ====== PLANETS ======
+    const textureLoader = new THREE.TextureLoader();
+    const earthMap = textureLoader.load('textures/earth_atmos_2048.jpg');
+    const earthSpecular = textureLoader.load('textures/earth_specular_2048.jpg');
+    const earthNormal = textureLoader.load('textures/earth_normal_2048.jpg');
+    const earthClouds = textureLoader.load('textures/earth_clouds_1024.png');
 
-    // ====== FLOATING DEBRIS ======
-    const floaters = [];
-    const fGeos = [new THREE.TetrahedronGeometry(0.4,0), new THREE.OctahedronGeometry(0.3,0), new THREE.BoxGeometry(0.5,0.5,0.5)];
-    for (let i = 0; i < 40; i++) {
-        const m = new THREE.Mesh(fGeos[Math.floor(Math.random()*3)], new THREE.MeshBasicMaterial({ color: palette[Math.floor(Math.random()*palette.length)], wireframe: true, transparent: true, opacity: 0.08+Math.random()*0.07 }));
-        m.position.set((Math.random()-0.5)*50, (Math.random()-0.5)*30, 40-Math.random()*140);
-        m.userData = { rs:{x:(Math.random()-0.5)*0.01,y:(Math.random()-0.5)*0.01,z:(Math.random()-0.5)*0.005}, fOff:Math.random()*Math.PI*2, fSpd:Math.random()*0.003+0.001 };
-        scene.add(m);
-        floaters.push(m);
-    }
+    const planets = [];
+    const planetData = [
+        { z: 26, r: 4.0, color: '#ffffff', type: 'earth', pos: [14, -6] }, // Subtle earth, pushed right and down
+        { z: 12, r: 3.0, color: '#8b4a3a', type: 'mars', pos: [-16, 8] }, // Subtle mars, pushed left and up
+        { z: -3, r: 7.0, color: '#d2a679', type: 'saturn', pos: [18, -4] }, // Gas giant (Saturn), pushed right
+        { z: -22, r: 3.5, color: '#505c66', type: 'rocky', pos: [-15, -6] }, // Rocky gray, pushed left and down
+        { z: -42, r: 5.5, color: '#4d7582', type: 'ice', pos: [16, 10] }, // Subtle ice, pushed right and up
+        { z: -62, r: 2.5, color: '#666666', type: 'moon', pos: [-12, -2] } // Moon, pushed left
+    ];
 
-    // ====== ENERGY BEAMS ======
-    for (let i = 0; i < 6; i++) {
-        const a = (i/6)*Math.PI*2, r = 8+Math.random()*4;
-        const pts = [new THREE.Vector3(Math.cos(a)*r, Math.sin(a)*r, 60), new THREE.Vector3(Math.cos(a)*r*0.3, Math.sin(a)*r*0.3, -100)];
-        scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: palette[i%palette.length], transparent: true, opacity: 0.03, blending: THREE.AdditiveBlending })));
+    planetData.forEach((p, i) => {
+        // Main solid sphere
+        const geo = new THREE.SphereGeometry(p.r, 64, 64);
+        let mat;
+        
+        if (p.type === 'earth') {
+            mat = new THREE.MeshPhongMaterial({
+                map: earthMap,
+                specularMap: earthSpecular,
+                normalMap: earthNormal,
+                specular: new THREE.Color(0x333333),
+                shininess: 15
+            });
+        } else {
+            mat = new THREE.MeshStandardMaterial({
+                color: p.color,
+                roughness: p.type === 'saturn' ? 0.3 : 0.8,
+                metalness: 0.1,
+                flatShading: p.type === 'moon' || p.type === 'rocky'
+            });
+        }
+        
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(p.pos[0], p.pos[1], p.z);
+        
+        if (p.type === 'earth') {
+            mesh.rotation.y = Math.PI;
+            mesh.rotation.x = 0.2;
+            
+            const cloudGeo = new THREE.SphereGeometry(p.r * 1.015, 64, 64);
+            const cloudMat = new THREE.MeshPhongMaterial({
+                map: earthClouds,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+            const clouds = new THREE.Mesh(cloudGeo, cloudMat);
+            mesh.add(clouds);
+            mesh.userData.clouds = clouds;
+        }
+
+        // Atmosphere glow (slightly larger, additive blending)
+        if (p.type !== 'moon' && p.type !== 'rocky' && p.type !== 'earth') {
+            const atmGeo = new THREE.SphereGeometry(p.r * 1.15, 32, 32);
+            const atmMat = new THREE.MeshBasicMaterial({
+                color: p.color,
+                transparent: true,
+                opacity: 0.1,
+                blending: THREE.AdditiveBlending
+            });
+            const atm = new THREE.Mesh(atmGeo, atmMat);
+            mesh.add(atm);
+        }
+
+        // Saturn Rings
+        if (p.type === 'saturn') {
+            const ringGeo = new THREE.RingGeometry(p.r * 1.3, p.r * 2.4, 64);
+            const ringMat = new THREE.MeshStandardMaterial({
+                color: '#e6c8a6',
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.9,
+                roughness: 0.6
+            });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            ringMesh.rotation.x = Math.PI / 2 - 0.3;
+            ringMesh.rotation.y = 0.1;
+            mesh.add(ringMesh);
+        }
+
+        mesh.userData.rotSpeed = (Math.random() - 0.5) * 0.005 + 0.002;
+        scene.add(mesh);
+        planets.push(mesh);
+    });
+
+    // ====== FLOATING ASTEROIDS ======
+    const asteroids = [];
+    for(let i=0; i<80; i++) {
+        const geo = new THREE.DodecahedronGeometry(Math.random() * 0.8 + 0.2, 0);
+        const mat = new THREE.MeshStandardMaterial({
+            color: '#555555',
+            roughness: 0.9,
+            metalness: 0.2,
+            flatShading: true
+        });
+        const ast = new THREE.Mesh(geo, mat);
+        // Ensure they are pushed out to the sides
+        const rx = (Math.random() < 0.5 ? 1 : -1) * (12 + Math.random() * 25);
+        const ry = (Math.random() < 0.5 ? 1 : -1) * (10 + Math.random() * 20);
+        ast.position.set(rx, ry, 40-Math.random()*130);
+        ast.userData = { 
+            rs: { x: Math.random()*0.02, y: Math.random()*0.02 },
+            fSpd: Math.random()*0.002
+        };
+        scene.add(ast);
+        asteroids.push(ast);
     }
 
     // ====== ANIMATE ======
@@ -725,100 +744,48 @@
         document.getElementById('scrollBar').style.width = (currentScroll * 100) + '%';
         camera.fov = 65 + scrollSpeed * 80;
         camera.updateProjectionMatrix();
-        scene.fog.density = 0.004 - scrollSpeed * 0.015;
+        
+        // Deep space fog
+        scene.fog.density = 0.003 - scrollSpeed * 0.01;
 
-        // Rings
-        rings.forEach(r => {
-            r.rotation.z += r.userData.rotSpeed + scrollSpeed * 0.3;
-            const d = Math.abs(camera.position.z - r.userData.baseZ);
-            const p = Math.max(0, 1 - d / 18);
-            r.material.opacity = 0.04 + p * 0.22 + scrollSpeed * 0.5;
-            r.scale.setScalar(1 + p * 0.15 + scrollSpeed * 0.8);
-        });
-        rings2.forEach(r => {
-            r.rotation.z += r.userData.rotSpeed + scrollSpeed * 0.2;
-            r.rotation.x += 0.001;
-            const d = Math.abs(camera.position.z - r.userData.baseZ);
-            r.material.opacity = 0.02 + Math.max(0, 1 - d/15) * 0.15 + scrollSpeed * 0.3;
-        });
+        // Animate Galaxy
+        galaxy.rotation.y = time * 0.02;
+        starsMat.opacity = 0.9 + scrollSpeed * 1.5;
 
-        // Particles
-        pMat.opacity = 0.6 + scrollSpeed * 2;
-        pMat.size = 0.12 + scrollSpeed * 0.5;
-
-        // Stream particles
-        const sp = streamP.geometry.attributes.position.array;
-        for (let i = 0; i < sCount; i++) {
-            sp[i*3+2] += scrollSpeed * 3 + 0.02;
-            if (sp[i*3+2] > camera.position.z + 15) {
-                sp[i*3+2] = camera.position.z - 40 - Math.random() * 20;
-                sp[i*3] = (Math.random()-0.5)*14;
-                sp[i*3+1] = (Math.random()-0.5)*14;
+        // Animate Planets
+        planets.forEach(p => {
+            p.rotation.y += p.userData.rotSpeed;
+            if (p.userData.clouds) {
+                p.userData.clouds.rotation.y += p.userData.rotSpeed * 0.2;
             }
-        }
-        streamP.geometry.attributes.position.needsUpdate = true;
-        sMat.opacity = 0.2 + scrollSpeed * 3;
-
-        // Hero icosahedron
-        heroIco.rotation.x = time * 0.15; heroIco.rotation.y = time * 0.2;
-        heroIcoIn.rotation.x = -time * 0.2; heroIcoIn.rotation.z = time * 0.15;
-        const hd = Math.abs(camera.position.z - 26);
-        const hp = Math.max(0, 1 - hd / 20);
-        heroIco.material.opacity = 0.08 + hp * 0.25;
-        heroIcoIn.material.opacity = 0.06 + hp * 0.2;
-        heroIco.scale.setScalar(1 + Math.sin(time * 0.8) * 0.05);
-        heroIcoIn.scale.setScalar(1 + Math.cos(time * 0.6) * 0.08);
-
-        // About sphere
-        aboutSph.rotation.y = time * 0.12;
-        aboutSph.rotation.x = Math.sin(time * 0.3) * 0.2;
-        const ad = Math.abs(camera.position.z - 12);
-        aboutSph.material.opacity = 0.05 + Math.max(0, 1 - ad/18) * 0.2;
-        aboutSph.scale.setScalar(1 + Math.sin(time * 0.5) * 0.03);
-
-        // Cube grid
-        cubeGrid.rotation.y = time * 0.1;
-        cubeGrid.rotation.x = Math.sin(time * 0.2) * 0.15;
-        const cd = Math.abs(camera.position.z - (-3));
-        const cpr = Math.max(0, 1 - cd/18);
-        cubeGrid.children.forEach(c => {
-            c.rotation.x += c.userData.rs.x + scrollSpeed * 0.5;
-            c.rotation.y += c.userData.rs.y + scrollSpeed * 0.5;
-            c.material.opacity = 0.08 + cpr * 0.3 + scrollSpeed * 0.3;
+            // Slight hover
+            p.position.y += Math.sin(time + p.position.x) * 0.002;
+            
+            // Fade out when passing the camera so it doesn't clip hard
+            const d = camera.position.z - p.position.z;
+            if (d < 12 && d > -20) {
+                p.material.transparent = true;
+                p.material.opacity = Math.max(0, (d + 20) / 32);
+                p.children.forEach(c => {
+                    if(c.material) {
+                        c.material.opacity = Math.max(0, (d + 20) / 32) * (c.geometry.type === 'RingGeometry' ? 0.9 : 0.1);
+                    }
+                });
+            } else {
+                p.material.transparent = false;
+                p.material.opacity = 1;
+                p.children.forEach(c => {
+                    if(c.material && c.geometry.type === 'SphereGeometry') c.material.opacity = 0.1; // atmosphere
+                    if(c.material && c.geometry.type === 'RingGeometry') c.material.opacity = 0.9; // saturn rings
+                });
+            }
         });
 
-        // Helix
-        helixG.rotation.y = time * 0.15;
-        const ed = Math.abs(camera.position.z - (-22));
-        const epr = Math.max(0, 1 - ed/18);
-        helixG.children.forEach(ch => {
-            if (ch.isMesh) { ch.material.opacity = (ch.material.color.equals(C.gold)?0.15:0.1) + epr*0.3 + scrollSpeed*0.2; ch.scale.setScalar(1+epr*0.3); }
-        });
-
-        // Projects
-        const pd = Math.abs(camera.position.z - (-42));
-        const ppr = Math.max(0, 1 - pd/20);
-        projG.children.forEach(m => {
-            m.rotation.x += m.userData.rs.x + scrollSpeed * 0.4;
-            m.rotation.y += m.userData.rs.y + scrollSpeed * 0.4;
-            m.material.opacity = 0.08 + ppr * 0.25 + scrollSpeed * 0.3;
-        });
-        projG.rotation.y = time * 0.08;
-
-        // Contact
-        ctSph.rotation.y = time * 0.1; ctSph.rotation.x = time * 0.07;
-        const ctd = Math.abs(camera.position.z - (-62));
-        ctSph.material.opacity = 0.06 + Math.max(0, 1-ctd/20)*0.2;
-        ctSph.scale.setScalar(1 + Math.sin(time*0.4)*0.04);
-        ctRing.rotation.z = time * 0.08;
-        ctRing.material.opacity = 0.04 + Math.max(0, 1-ctd/20)*0.15;
-
-        // Floaters
-        floaters.forEach(f => {
-            f.rotation.x += f.userData.rs.x; f.rotation.y += f.userData.rs.y; f.rotation.z += f.userData.rs.z;
-            f.position.y += Math.sin(time*f.userData.fSpd*100+f.userData.fOff)*0.003;
-            const fd = Math.abs(camera.position.z - f.position.z);
-            f.material.opacity = 0.05 + Math.max(0,1-fd/20)*0.15 + scrollSpeed*0.2;
+        // Animate Asteroids
+        asteroids.forEach(ast => {
+            ast.rotation.x += ast.userData.rs.x;
+            ast.rotation.y += ast.userData.rs.y;
+            ast.position.y += Math.sin(time*ast.userData.fSpd*100 + ast.position.x) * 0.005;
         });
 
         renderer.render(scene, camera);
